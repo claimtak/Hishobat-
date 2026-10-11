@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="mr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1565c0"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><title>Reminder</title>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font:15px system-ui,sans-serif;background:#f3f7fb;color:#1b2a3a;padding-bottom:72px}
+header{background:#fff;padding:8px 14px;box-shadow:0 1px 4px #0002;position:sticky;top:0;z-index:2}header img{height:40px;display:block}
+main{padding:12px;max-width:640px;margin:auto}
+.c{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px #0001}
+.sum{background:linear-gradient(135deg,#1565c0,#2e9d6b);color:#fff}.sum b{font-size:28px;display:block}
+button,select,input,textarea{font:inherit}
+button{background:#1565c0;color:#fff;border:0;border-radius:8px;padding:8px 12px;margin:3px 3px 0 0}
+button.g{background:#2e9d6b}button.r{background:#d32f2f}button.l{background:#e3edf7;color:#1565c0}
+label{display:block;margin:10px 0 3px;font-size:13px;color:#456}
+input,select,textarea{width:100%;padding:9px;border:1px solid #c5d3e0;border-radius:8px;background:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;box-shadow:0 -1px 4px #0002;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;color:#456;border-radius:0;margin:0;padding:9px 0;font-size:11px;border-top:3px solid transparent}
+nav button.a{color:#1565c0;font-weight:700;border-top-color:#1565c0}
+.od{color:#d32f2f;font-weight:600}.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+small{color:#678}td{padding:4px 2px;border-bottom:1px solid #eef}
+#lock{position:fixed;inset:0;background:#fff;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px}#lock.on{display:flex}#lock input{width:140px;text-align:center}#lock img{height:110px}
+@media print{header,nav,.np{display:none}}
+</style></head><body>
+<div id="lock"><img src="icon-192.png"><input id="lp" type="password" inputmode="numeric" maxlength="4"><button onclick="ul()" id="lb"></button><small id="lm" class="od"></small></div>
+<header><img src="icon-192.png" alt=""></header><main></main><nav></nav>
+<script>
+const CID='YOUR_GOOGLE_CLIENT_ID';
+const $=s=>document.querySelector(s);
+const FQ=['मासिक|मासिक|Monthly','तिमाही|तिमाही|Quarterly','सहामाही|छमाही|Half-yearly','वार्षिक|वार्षिक|Yearly','सिंगल|एकल|Single'],MO=[1,3,6,12,0];
+const T={n_home:'मुख्य|होम|Home',n_ins:'इन्शुरन्स|बीमा|Insurance',n_loan:'लोन|लोन|Loan',n_oth:'इतर|अन्य|Other',n_rep:'हिशोब|हिसाब|Reports',n_set:'सेटिंग|सेटिंग|Settings',
+ins:'इन्शुरन्स|बीमा|Insurance',loan:'लोन|लोन|Loan',oth:'इतर महत्त्वाच्या तारखा|अन्य महत्वपूर्ण तारीखें|Other important dates',
+mt:'या महिन्यात भरायचे|इस महीने भरना है|To pay this month',up:'पुढील देय|आगामी देय|Upcoming',none:'नोंद नाही|कोई प्रविष्टि नहीं|Nothing here',add:'+ नवीन नोंद|+ नई प्रविष्टि|+ New entry',
+save:'जतन करा|सेव करें|Save',cancel:'रद्द|रद्द|Cancel',edit:'बदला|बदलें|Edit',del:'डिलीट|डिलीट|Delete',paid:'भरले|भरा गया|Paid',cal:'Calendar मध्ये जोडा|Calendar में जोड़ें|Add to Calendar',
+sure:'खात्री आहे का?|पक्का?|Are you sure?',trash:'कचरापेटी (३० दिवस)|कचरापेटी (30 दिन)|Trash (30 days)',restore:'परत आणा|वापस लाएं|Restore',lang:'भाषा|भाषा|Language',
+pin:'पिन (४ अंक, रिकामा = बंद)|पिन (4 अंक, खाली = बंद)|PIN (4 digits, empty = off)',bk:'Drive वर बॅकअप|Drive पर बैकअप|Backup to Drive',rs:'बॅकअप परत आणा|बैकअप वापस लाएं|Restore backup',
+au:'आपोआप बॅकअप|ऑटो बैकअप|Auto backup',hist:'भरल्याची नोंद|भुगतान इतिहास|Payments',month:'महिना|महीना|Month',fy:'आर्थिक वर्ष|वित्त वर्ष|Financial year',csv:'Excel (CSV)|Excel (CSV)|Excel (CSV)',
+tot:'एकूण|कुल|Total',unl:'उघडा|खोलें|Unlock',wrong:'चुकीचा पिन|गलत पिन|Wrong PIN',done:'झाले|हो गया|Done',
+title:'नाव|नाम|Name',type:'प्रकार|प्रकार|Type',co:'कंपनी|कंपनी|Company',no:'क्रमांक|क्रमांक|Number',holder:'कोणाच्या नावावर|किसके नाम पर|In whose name',amt:'प्रीमियम / रक्कम|प्रीमियम / राशि|Premium / amount',
+freq:'वारंवारता|आवृत्ति|Frequency',due:'पुढची देय तारीख|अगली देय तिथि|Next due date',sa:'विम्याची रक्कम|बीमा राशि|Sum assured',end:'संपण्याची तारीख|समाप्ति तिथि|End date',
+bank:'बँक / संस्था|बैंक / संस्था|Bank / lender',ltotal:'एकूण लोन रक्कम|कुल लोन राशि|Total loan',rate:'व्याजदर %|ब्याज दर %|Interest %',months:'कालावधी (महिने)|अवधि (महीने)|Tenure (months)',
+start:'सुरू तारीख|आरंभ तिथि|Start date',cat:'श्रेणी|श्रेणी|Category','loan.amt':'EMI रक्कम|EMI राशि|EMI amount','loan.due':'पुढची EMI तारीख|अगली EMI तिथि|Next EMI date',
+note:'टीप|नोट|Note',rem:'रिमाइंडर (किती दिवस आधी, स्वल्पविरामाने)|रिमाइंडर (कितने दिन पहले, कॉमा से)|Reminders (days before, comma separated)',rt:'रिमाइंडर वेळ|रिमाइंडर समय|Reminder time',files:'कागदपत्रे (फोटो/PDF)|दस्तावेज़ (फोटो/PDF)|Documents (photo/PDF)'};
+const F={ins:[['title','t'],['type','s',['जीवन|जीवन|Life','आरोग्य|स्वास्थ्य|Health','वाहन|वाहन|Vehicle','घर|घर|Home','इतर|अन्य|Other']],['co','t'],['no','t'],['holder','t'],['amt','n'],['freq','s',FQ],['due','d'],['sa','n'],['end','d']],
+loan:[['type','s',['गृह|गृह|Home','वाहन|वाहन|Vehicle','वैयक्तिक|व्यक्तिगत|Personal','शिक्षण|शिक्षा|Education','सोनेतारण|गोल्ड|Gold','इतर|अन्य|Other']],['bank','t'],['no','t'],['holder','t'],['ltotal','n'],['rate','n'],['months','n'],['amt','n'],['due','d'],['start','d'],['end','d']],
+oth:[['title','t'],['cat','s',['बिल|बिल|Bill','क्रेडिट कार्ड|क्रेडिट कार्ड|Credit card','FD/RD/SIP|FD/RD/SIP|FD/RD/SIP','वाहन कागदपत्र|वाहन दस्तावेज़|Vehicle document','इतर|अन्य|Other']],['amt','n'],['due','d'],['freq','s',FQ]]};
+let S={lang:0,pin:'',items:[],auto:0},db,v=['home'],rp={},tmp=[],rows=[];
+const t=s=>s.split('|')[S.lang]||s,L=k=>t(T[k]||T[k.split('.').pop()]||k);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+function addM(s,m){const d=new Date(s+'T00:00'),x=d.getDate();d.setMonth(d.getMonth()+m);if(d.getDate()!=x)d.setDate(0);return iso(d)}
+const mon=i=>i.seg=='loan'?1:MO[i.f.freq??4],find=id=>S.items.find(x=>x.id==id),act=()=>S.items.filter(i=>!i.del);
+const opt=(s,k,n)=>{const o=F[s].find(x=>x[0]==k)[2];return t(o[n]||o[0])},ttl=i=>i.seg=='loan'?opt('loan','type',i.f.type)+' '+(i.f.bank||''):(i.f.title||'');
+const idb=()=>new Promise(r=>{const q=indexedDB.open('ct',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result)});
+const get=async()=>{db=db||await idb();return new Promise(r=>{const q=db.transaction('k').objectStore('k').get('S');q.onsuccess=()=>r(q.result)})};
+const put=async nb=>{db=db||await idb();db.transaction('k','readwrite').objectStore('k').put(S,'S');if(!nb)auto()};
+const hash=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ct'+s)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+const go=(...a)=>{v=a;R();scrollTo(0,0)};
+function card(i){const f=i.f,od=f.due&&f.due<iso(new Date());
+return `<div class="c"><div class="row"><b>${esc(ttl(i))}</b><span>₹${f.amt||0}</span></div><small>${L(i.seg)} · </small><small class="${od?'od':''}">${f.due||''}</small> ${(i.files||[]).map((x,n)=>`<a href="#" onclick="openF('${i.id}',${n});return false">📎</a>`).join(' ')}<div>${f.due?`<button class="g" onclick="paid('${i.id}')">${L('paid')}</button><button class="l" onclick="ics('${i.id}')">${L('cal')}</button>`:''}<button class="l" onclick="go('form','${i.seg}','${i.id}')">${L('edit')}</button><button class="r" onclick="rm('${i.id}')">${L('del')}</button></div></div>`}
+function home(){const ym=iso(new Date()).slice(0,7),a=act().filter(i=>i.f.due).sort((x,y)=>x.f.due<y.f.due?-1:1),s=a.filter(i=>i.f.due.slice(0,7)<=ym).reduce((n,i)=>n+(+i.f.amt||0),0);
+return `<div class="c sum"><small style="color:#fff">${L('mt')}</small><b>₹${s.toLocaleString('en-IN')}</b></div><h3>${L('up')}</h3>`+(a.map(card).join('')||`<p>${L('none')}</p>`)}
+function list(s){const a=act().filter(i=>i.seg==s).sort((x,y)=>(x.f.due||'9')<(y.f.due||'9')?-1:1);return `<h3>${L(s)}</h3><button onclick="go('form','${s}')">${L('add')}</button>`+(a.map(card).join('')||`<p>${L('none')}</p>`)}
+const fl=()=>tmp.map((x,n)=>esc(x.n)+` <a href="#" onclick="tmp.splice(${n},1);$('#fls').innerHTML=fl();return false">✕</a>`).join('<br>');
+function form(s,id){const i=id?find(id):{seg:s,f:{freq:4,type:0,cat:0},rem:'7,1,0',rt:'09:00',files:[]};tmp=[...(i.files||[])];
+const fs=F[s].map(([k,ty,o])=>{const x=i.f[k]??'';return `<label>${L(s+'.'+k)}</label>`+(ty=='s'?`<select id="f_${k}">${o.map((y,n)=>`<option value="${n}" ${x==n?'selected':''}>${t(y)}</option>`).join('')}</select>`:`<input id="f_${k}" type="${ty=='n'?'number':ty=='d'?'date':'text'}" ${ty=='n'?'inputmode="decimal"':''} value="${esc(x)}">`)}).join('');
+return `<h3>${L(s)}</h3><div class="c">${fs}<label>${L('rem')}</label><input id="rem" value="${esc(i.rem)}"><label>${L('rt')}</label><input id="rt" type="time" value="${i.rt}"><label>${L('note')}</label><textarea id="note">${esc(i.f.note||'')}</textarea><label>${L('files')}</label><input type="file" multiple accept="image/*,application/pdf" onchange="addF(this)"><div id="fls">${fl()}</div><p><button onclick="save('${s}','${id||''}')">${L('save')}</button><button class="l" onclick="go('list','${s}')">${L('cancel')}</button></p></div>`}
+function save(s,id){const f={};F[s].forEach(([k])=>f[k]=$('#f_'+k).value);f.note=$('#note').value;const o={seg:s,f,rem:$('#rem').value,rt:$('#rt').value,files:tmp};
+if(id)Object.assign(find(id),o);else S.items.push({id:Date.now().toString(36),hist:[],...o});put();go('list',s)}
+const rd=f=>new Promise(r=>{const x=new FileReader;x.onload=()=>r(x.result);x.readAsDataURL(f)});
+async function addF(e){for(const f of e.files){let u;if(f.type.startsWith('image')){const m=new Image;m.src=await rd(f);await m.decode();const k=Math.min(1,1000/Math.max(m.width,m.height)),c=document.createElement('canvas');c.width=m.width*k;c.height=m.height*k;c.getContext('2d').drawImage(m,0,0,c.width,c.height);u=c.toDataURL('image/jpeg',.6)}else if(f.size<1.5e6)u=await rd(f);else{alert('PDF max 1.5 MB');continue}tmp.push({n:f.name,u})}e.value='';$('#fls').innerHTML=fl()}
+const openF=(id,n)=>fetch(find(id).files[n].u).then(r=>r.blob()).then(b=>open(URL.createObjectURL(b)));
+function paid(id){const i=find(id),m=mon(i);i.hist.push({d:iso(new Date()),a:+i.f.amt||0});i.f.due=m?addM(i.f.due,m):'';put();R()}
+function rm(id){if(confirm(L('sure'))){find(id).del=Date.now();put();R()}}
+function dl(n,b,ty){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([b],{type:ty}));a.download=n;a.click()}
+function ics(id){const i=find(id),m=mon(i),n=ttl(i).replace(/[,;\n]/g,' '),al=String(i.rem||'0').split(',').map(x=>x.trim()).filter(x=>x!=='').map(x=>`BEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:${n}\r\nTRIGGER:${+x?'-P'+(+x)+'D':'PT0S'}\r\nEND:VALARM`).join('\r\n');
+dl('reminder.ics',`BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Reminder//EN\r\nBEGIN:VEVENT\r\nUID:${id}${Date.now()}@reminder\r\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g,'').slice(0,15)}Z\r\nDTSTART:${i.f.due.replace(/-/g,'')}T${(i.rt||'09:00').replace(':','')}00\r\nDURATION:PT30M\r\nSUMMARY:${n} ₹${i.f.amt||0}\r\n${m?`RRULE:FREQ=MONTHLY;INTERVAL=${m}\r\n`:''}${al}\r\nEND:VEVENT\r\nEND:VCALENDAR`,'text/calendar')}
+function rep(){const n=new Date(),y=n.getFullYear()-(n.getMonth()<3?1:0);if(!rp.t)rp={t:'m',m:iso(n).slice(0,7),y};
+const[a,b]=rp.t=='m'?[rp.m+'-01',rp.m+'-31']:[rp.y+'-04-01',(rp.y+1)+'-03-31'];rows=[];
+act().forEach(i=>i.hist.filter(h=>h.d>=a&&h.d<=b).forEach(h=>rows.push([h.d,L(i.seg),ttl(i),h.a])));rows.sort();const s=rows.reduce((n,r)=>n+r[3],0);
+return `<div class="c np"><select onchange="rp.t=this.value;R()"><option value="m" ${rp.t=='m'?'selected':''}>${L('month')}</option><option value="y" ${rp.t=='y'?'selected':''}>${L('fy')}</option></select>`+(rp.t=='m'?`<input type="month" value="${rp.m}" onchange="rp.m=this.value;R()">`:`<select onchange="rp.y=+this.value;R()">${[...Array(6)].map((_,k)=>{const x=y-4+k;return `<option value="${x}" ${x==rp.y?'selected':''}>${x}-${String(x+1).slice(2)}</option>`}).join('')}</select>`)+`<button onclick="csv()">${L('csv')}</button><button class="g" onclick="print()">PDF</button></div><div class="c"><b>${L('hist')}</b> ${rp.t=='m'?rp.m:rp.y+'-'+(rp.y+1)}<table width="100%">${rows.map(r=>`<tr><td>${r[0]}<td>${esc(r[2])}<td align="right">₹${r[3]}`).join('')}<tr><td colspan="2"><b>${L('tot')}</b><td align="right"><b>₹${s}</b></table></div>`}
+const csv=()=>dl('hisab.csv','\ufeff'+[['Date','Type','Name','Amount'],...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');
+const trash=()=>`<h3>${L('trash')}</h3>`+(S.items.filter(i=>i.del).map(i=>`<div class="c row"><span>${esc(ttl(i))}</span><button class="l" onclick="delete find('${i.id}').del;put();R()">${L('restore')}</button></div>`).join('')||`<p>${L('none')}</p>`);
+const sett=()=>`<div class="c"><label>${L('lang')}</label><select onchange="S.lang=+this.value;put();R()">${['मराठी','हिंदी','English'].map((x,n)=>`<option value="${n}" ${S.lang==n?'selected':''}>${x}</option>`).join('')}</select><label>${L('pin')}</label><input id="pin" type="password" inputmode="numeric" maxlength="4"><button onclick="setPin()">${L('save')}</button></div><div class="c"><button onclick="bak()">${L('bk')}</button><button class="l" onclick="res()">${L('rs')}</button><label><input type="checkbox" style="width:auto" ${S.auto?'checked':''} onchange="S.auto=+this.checked;put(1)"> ${L('au')}</label></div><button class="l" onclick="go('trash')">🗑️ ${L('trash')}</button>`;
+async function setPin(){const x=$('#pin').value;if(x&&!/^\d{4}$/.test(x))return alert('4');S.pin=x?await hash(x):'';put();alert(L('done'))}
+async function ul(){if(await hash($('#lp').value)==S.pin){$('#lock').classList.remove('on');$('#lp').value=''}else $('#lm').textContent=L('wrong')}
+let tok,exp=0,tc,pend,tm;
+function auth(cb){if(tok&&Date.now()<exp)return cb();pend=cb;if(!window.google)return alert('Offline');tc=tc||google.accounts.oauth2.initTokenClient({client_id:CID,scope:'https://www.googleapis.com/auth/drive.appdata',callback:r=>{if(r.access_token){tok=r.access_token;exp=Date.now()+3.4e6;pend&&pend()}}});tc.requestAccessToken()}
+const H=()=>({Authorization:'Bearer '+tok});
+async function fid(){const r=await(await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D'ct.json'&fields=files(id)",{headers:H()})).json();return r.files[0]?.id}
+function bak(q){auth(async()=>{try{const id=await fid(),b='x'+Date.now(),m=JSON.stringify(id?{}:{name:'ct.json',parents:['appDataFolder']}),body=`--${b}\r\nContent-Type: application/json\r\n\r\n${m}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(S)}\r\n--${b}--`;
+const r=await fetch(`https://www.googleapis.com/upload/drive/v3/files${id?'/'+id:''}?uploadType=multipart`,{method:id?'PATCH':'POST',headers:{...H(),'Content-Type':'multipart/related; boundary='+b},body});if(!r.ok)throw 0;if(!q)alert(L('done'))}catch(e){if(!q)alert('Error')}})}
+function res(){auth(async()=>{const id=await fid();if(!id)return alert(L('none'));if(!confirm(L('sure')))return;S=await(await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{headers:H()})).json();await put(1);R()})}
+const auto=()=>{if(!S.auto||!navigator.onLine)return;clearTimeout(tm);tm=setTimeout(()=>{if(tok&&Date.now()<exp)bak(1)},4000)};
+function R(){document.documentElement.lang=['mr','hi','en'][S.lang];const[n,a,b]=v,tab=n=='list'||n=='form'?a:n=='trash'?'set':n;
+$('main').innerHTML={home,list,form,rep,trash,set:sett}[n](a,b);$('#lb').textContent=L('unl');
+$('nav').innerHTML=[['home','🏠'],['ins','🛡️'],['loan','🏦'],['oth','📅'],['rep','📊'],['set','⚙️']].map(([k,e])=>`<button class="${tab==k?'a':''}" onclick="${['home','rep','set'].includes(k)?`go('${k}')`:`go('list','${k}')`}">${e}<br>${L('n_'+k)}</button>`).join('')}
+(async()=>{const d=await get();if(d)S={...S,...d};S.items=S.items.filter(i=>!i.del||Date.now()-i.del<2592e6);S.items.forEach(i=>i.hist=i.hist||[]);R();if(S.pin)$('#lock').classList.add('on');if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js')})();
+</script></body></html>
